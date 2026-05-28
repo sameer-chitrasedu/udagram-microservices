@@ -14,10 +14,8 @@ jobs:
             # Login to Docker Hub
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             
-            # List of services to build
-            services=("udagram-api-feed" "udagram-api-user" "udagram-frontend" "udagram-reverseproxy")
-            
-            for service in "${services[@]}"; do
+            # Simplified loop for better compatibility
+            for service in udagram-api-feed udagram-api-user udagram-frontend udagram-reverseproxy; do
               echo "--------------------------------------"
               echo "Building and Pushing: $service"
               echo "--------------------------------------"
@@ -25,6 +23,7 @@ jobs:
               docker tag $service $DOCKER_USERNAME/$service:v1
               docker push $DOCKER_USERNAME/$service:v1
             done
+
 workflows:
   main:
     jobs:
