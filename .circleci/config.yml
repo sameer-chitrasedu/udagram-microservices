@@ -4,17 +4,18 @@ jobs:
   build:
     docker:
       - image: cimg/base:current
+    resource_class: medium
     steps:
       - checkout
       - setup_remote_docker:
-          version: 20.10.14
+          docker_layer_caching: false
       - run:
           name: Build and push Docker images
           command: |
             # Login to Docker Hub
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             
-            # Simplified loop for better compatibility
+            # Build and push each service
             for service in udagram-api-feed udagram-api-user udagram-frontend udagram-reverseproxy; do
               echo "--------------------------------------"
               echo "Building and Pushing: $service"
