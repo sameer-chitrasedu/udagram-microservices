@@ -21,7 +21,6 @@ npm-debug.log*
 coverage/
 www/
 node_modules/
-.angular/
 tmp/
 temp/
 platforms/
@@ -31,11 +30,6 @@ plugins/ios.json
 $RECYCLE.BIN/
 postgres_dev/
 logfile
-
-# Environment Variables
-.env
-set_env.sh
-set_env.ps1
 
 .DS_Store
 Thumbs.db

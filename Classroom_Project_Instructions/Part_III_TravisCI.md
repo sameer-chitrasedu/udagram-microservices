@@ -13,7 +13,7 @@ Log in to https://hub.docker.com/ and create four public repositories - each rep
 * `udagram-api-feed`
 * `udagram-frontend`
 
-> Note: The names of the repositoriesare exactly the same as the `image name` specified in the *docker-compose-build.yaml* file
+> Note: The names of the repositories are exactly the same as the `image name` specified in the *docker-compose-build.yaml* file
 
 ### Set up Travis CI Pipeline
 
@@ -24,29 +24,74 @@ Use Travis CI pipeline to build and push images to your DockerHub registry.
 2. Integrate Github with Travis: Activate your GitHub repository with whom you want to set up the CI pipeline. 
 
 3. Set up your Dockerhub username and password in the Travis repository's settings, so that they can be used inside of `.travis.yml` file while pushing images to the Dockerhub. 
+    * `DOCKER_USERNAME`
+    * `DOCKER_PASSWORD`
 
 4. Add a `.travis.yml` configuration file to the project directory locally. 
 
-    In addition to the mandatory sections, your Travis file should automatically read the Dockerfiles, build images, and push images to DockerHub. For build and push, you can use either `docker-compose` or individual `docker build` commands as shown below. 
+    In addition to the mandatory sections, your Travis file should automatically read the Dockerfiles, build images, and push images to DockerHub. 
+
+    #### Build
     ```bash
-    # Assuming the .travis.yml file is in the project directory, and there is a separate sub-directory for each service
-    # Use either `docker-compose` or individual `docker build` commands
-    # Build
-      - docker build -t udagram-api-feed ./udagram-api-feed
-    # Do similar for other three images
+    docker build -t udagram-api-feed ./udagram-api-feed
+    docker build -t udagram-api-user ./udagram-api-user
+    docker build -t udagram-frontend ./udagram-frontend
+    docker build -t udagram-reverseproxy ./udagram-reverseproxy
     ```
 
+    #### Tagging
     ```bash
-    # Tagging
-      - docker tag udagram-api-feed sudkul/udagram-api-feed:v1
-    # Do similar for other three images```
-    ```bash
-    # Push
-    # Assuming DOCKER_PASSWORD and DOCKER_USERNAME are set in the Travis repository settings
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker push sudkul/udagram-api-feed:v1
-    # Do similar for other three images
+    docker tag udagram-api-feed <your-docker-username>/udagram-api-feed:v1
+    docker tag udagram-api-user <your-docker-username>/udagram-api-user:v1
+    docker tag udagram-frontend <your-docker-username>/udagram-frontend:v1
+    docker tag udagram-reverseproxy <your-docker-username>/udagram-reverseproxy:v1
     ```
+
+    #### Push
+    ```bash
+    # Assuming DOCKER_PASSWORD and DOCKER_USERNAME are set in the Travis repository settings
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    docker push <your-docker-username>/udagram-api-feed:v1
+    docker push <your-docker-username>/udagram-api-user:v1
+    docker push <your-docker-username>/udagram-frontend:v1
+    docker push <your-docker-username>/udagram-reverseproxy:v1
+    ```
+
+    #### Complete `.travis.yml` Example
+    ```yaml
+    language: node_js
+    node_js:
+      - "node"
+
+    services:
+      - docker
+
+    # Pre-processing
+    install:
+      - echo "nothing needs to be installed"
+
+    # Method of execution
+    script:
+      - docker --version
+      - docker build -t udagram-api-feed ./udagram-api-feed
+      - docker build -t udagram-api-user ./udagram-api-user
+      - docker build -t udagram-frontend ./udagram-frontend
+      - docker build -t udagram-reverseproxy ./udagram-reverseproxy
+      # Tagging
+      - docker tag udagram-api-feed $DOCKER_USERNAME/udagram-api-feed:v1
+      - docker tag udagram-api-user $DOCKER_USERNAME/udagram-api-user:v1
+      - docker tag udagram-frontend $DOCKER_USERNAME/udagram-frontend:v1
+      - docker tag udagram-reverseproxy $DOCKER_USERNAME/udagram-reverseproxy:v1
+
+    # Tasks to perform after the process is successful.
+    after_success:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker push $DOCKER_USERNAME/udagram-api-feed:v1
+      - docker push $DOCKER_USERNAME/udagram-api-user:v1
+      - docker push $DOCKER_USERNAME/udagram-frontend:v1
+      - docker push $DOCKER_USERNAME/udagram-reverseproxy:v1
+    ```
+
 > **Tip**: Use different tags each time you push images to the Dockerhub.   
 
 

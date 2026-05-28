@@ -1,0 +1,17 @@
+services:
+  backend-user:
+    image: udagram-api-user
+    build:
+      context: ./udagram-api-user
+  backend-feed:
+    image: udagram-api-feed
+    build:
+      context: ./udagram-api-feed
+  frontend:
+    image: udagram-frontend
+    build:
+      context: ./udagram-frontend
+  reverseproxy:
+    image: udagram-reverseproxy
+    build:
+      context: ./udagram-reverseproxy
