@@ -1,0 +1,31 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+      - run:
+          name: Build and push Docker images
+          command: |
+            # Login to Docker Hub
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            
+            # List of services to build
+            services=("udagram-api-feed" "udagram-api-user" "udagram-frontend" "udagram-reverseproxy")
+            
+            for service in "${services[@]}"; do
+              echo "--------------------------------------"
+              echo "Building and Pushing: $service"
+              echo "--------------------------------------"
+              docker build -t $service ./$service
+              docker tag $service $DOCKER_USERNAME/$service:v1
+              docker push $DOCKER_USERNAME/$service:v1
+            done
+workflows:
+  main:
+    jobs:
+      - build
